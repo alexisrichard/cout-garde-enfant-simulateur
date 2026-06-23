@@ -1,0 +1,15 @@
+# ── Données personnelles — NE JAMAIS committer ──
+config.js
+
+# Documents personnels (relevés, bulletins, guides nominatifs…)
+*.pdf
+*.xlsx
+*.xls
+*.docx
+*.csv
+
+# Système / outils
+.DS_Store
+node_modules/
+.vscode/
+*.log

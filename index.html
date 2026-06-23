@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur coût de garde d'enfant — garde à domicile & crèche (2026)</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#fff; --ink:#1d2433; --muted:#6b7280; --line:#e5e7eb;
+    --accent:#2563eb; --accent-soft:#eff4ff; --green:#0f9d6b; --red:#dc2626; --amber:#b45309;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5}
+  header{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:28px 20px}
+  header h1{margin:0 0 4px;font-size:1.5rem}
+  header p{margin:0;opacity:.9;font-size:.95rem}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:840px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:18px}
+  .card h2{margin:0 0 14px;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+  .card h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  label{display:block;font-size:.82rem;color:var(--muted);margin:10px 0 4px}
+  input[type=number],select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;
+    font-size:1rem;background:#fff;color:var(--ink)}
+  input:focus,select:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .switch{display:flex;align-items:center;gap:10px;margin:2px 0 6px;cursor:pointer;font-size:.95rem;font-weight:600}
+  .switch input{width:auto;transform:scale(1.25)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+  .presets button{border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:20px;
+    padding:6px 14px;font-size:.85rem;cursor:pointer}
+  .presets button:hover{background:var(--accent-soft)}
+  .res-total{background:var(--accent-soft);border:1px solid #c7d7fe;border-radius:12px;padding:16px;text-align:center;margin-bottom:14px}
+  .res-total .big{font-size:2.1rem;font-weight:800;color:var(--accent)}
+  .res-total .sub{color:var(--muted);font-size:.9rem}
+  .line{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:.92rem}
+  .line:last-child{border-bottom:none}
+  .line .v{font-variant-numeric:tabular-nums;font-weight:600}
+  .neg{color:var(--green)} .pos{color:var(--ink)}
+  .group-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 0 4px}
+  .warn{background:#fffbeb;border:1px solid #fde68a;color:var(--amber);padding:10px 12px;border-radius:9px;font-size:.85rem;margin-top:10px}
+  .ok{color:var(--green);font-size:.82rem;margin-top:8px}
+  details{margin-top:8px;font-size:.85rem;color:var(--muted)}
+  .muted{color:var(--muted);font-size:.8rem}
+  footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--muted);font-size:.8rem}
+  footer a{color:var(--accent)}
+  .hint{font-size:.74rem;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap" style="padding:0">
+    <h1>🍼 Simulateur du coût de garde d'enfant</h1>
+    <p>Garde à domicile (Pajemploi / CMG) &amp; crèche (barème PSU) — paramètres 2026. Estimation indicative.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="presets">
+    <strong style="align-self:center;font-size:.85rem;margin-right:4px">Scénarios&nbsp;:</strong>
+    <button onclick="preset('domicileSeule')">Garde à domicile seule (48 h)</button>
+    <button onclick="preset('mix')">Crèche 30 h + domicile 35 h</button>
+    <button onclick="preset('crecheSeule')">Crèche seule (temps plein)</button>
+  </div>
+
+  <div class="grid">
+    <!-- ======== PARAMÈTRES ======== -->
+    <div>
+      <div class="card">
+        <h2><span class="dot"></span>Votre foyer</h2>
+        <label>Revenu mensuel du foyer (net imposable, année N-2)</label>
+        <input type="number" id="revenu" value="5000" min="0" step="100">
+        <div class="hint">Au-delà de 8 500 €/mois, les aides sont plafonnées (le montant exact n'a alors plus d'impact).</div>
+        <div class="row">
+          <div>
+            <label>Nombre d'enfants à charge</label>
+            <input type="number" id="nbEnfants" value="2" min="1" max="8" step="1">
+          </div>
+          <div>
+            <label>Autres niches fiscales déjà utilisées (€/an)</label>
+            <input type="number" id="autresNiches" value="0" min="0" step="100">
+          </div>
+        </div>
+        <div class="hint">Plafond global des crédits/réductions d'impôt : 10 000 €/an et par foyer.</div>
+      </div>
+
+      <div class="card">
+        <h2><span class="dot"></span>Garde à domicile (Pajemploi)</h2>
+        <label class="switch"><input type="checkbox" id="gadOn" checked> Activer la garde à domicile</label>
+        <div class="row">
+          <div>
+            <label>Heures par semaine</label>
+            <input type="number" id="gadHeures" value="40" min="0" max="60" step="1">
+          </div>
+          <div>
+            <label>Taux horaire brut (€)</label>
+            <input type="number" id="gadTaux" value="12.89" min="0" step="0.01">
+          </div>
+        </div>
+        <label>Âge du plus jeune enfant gardé à domicile</label>
+        <select id="gadAge">
+          <option value="moins3">Moins de 3 ans (plafond CMG cotis. 524 €)</option>
+          <option value="3a6">3 à 6 ans (plafond CMG cotis. 263 €)</option>
+        </select>
+        <div class="hint">Au-delà de 40 h/sem : +25 % (41→48 h), +50 % (&gt;48 h).</div>
+      </div>
+
+      <div class="card">
+        <h2><span class="dot"></span>Crèche (accueil collectif)</h2>
+        <label class="switch"><input type="checkbox" id="crOn"> Activer la crèche</label>
+        <div class="row">
+          <div>
+            <label>Commune / type</label>
+            <select id="crVille">
+              <option value="prive">Crèche privée PSU / employeur</option>
+              <option value="paris">Paris</option>
+              <option value="levallois">Levallois-Perret</option>
+              <option value="neuilly">Neuilly-sur-Seine</option>
+            </select>
+          </div>
+          <div>
+            <label>Heures réservées / semaine</label>
+            <input type="number" id="crHeures" value="50" min="0" max="60" step="1">
+          </div>
+        </div>
+        <div class="hint">Mensualisation 52 sem/an (place réservée). Repas, couches, lait inclus.</div>
+      </div>
+    </div>
+
+    <!-- ======== RÉSULTATS ======== -->
+    <div>
+      <div class="card">
+        <h2><span class="dot" style="background:var(--green)"></span>Coût réel estimé</h2>
+        <div class="res-total">
+          <div class="big" id="totalMois">— €</div>
+          <div class="sub">par mois, après crédits d'impôt · <span id="totalAn">— €</span>/an</div>
+        </div>
+        <div id="breakdown"></div>
+        <div id="ceilingNote"></div>
+      </div>
+      <div class="card">
+        <h2><span class="dot" style="background:var(--amber)"></span>Détail du calcul</h2>
+        <div id="detail" class="muted"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p><strong>Avertissement.</strong> Estimation indicative, sans valeur contractuelle. Ne constitue pas un conseil fiscal.
+  Vérifiez vos droits réels sur les simulateurs officiels (Pajemploi / CAF) et auprès d'un professionnel.</p>
+  <p>Paramètres 2026 vérifiés sur sources officielles (URSSAF, CNAF, service-public, impots.gouv).
+  Modèle « garde à domicile » validé contre le simulateur URSSAF ; modèle « crèche » contre le simulateur Les Petits Chaperons Rouges.
+  Code &amp; sources : voir le <a href="README.md">README</a>.</p>
+</footer>
+
+<!-- Config personnelle optionnelle (gitignored). Copiez config.example.js -> config.js -->
+<script src="config.js" onerror="void 0"></script>
+<script>
+// ====================== PARAMÈTRES 2026 (vérifiés) ======================
+const P = {
+  gad:{
+    tauxSalarial:0.21880, tauxPatronal:0.44696, santeTravailFixe:5.00,
+    deductionParHeure:2.00, semainesTravaillees:47,
+    coutRef:10.50, plafondRessources:8500, plancher:814.62,
+    tauxEffort:{1:0.001238,2:0.001032,3:0.000826,4:0.000620,5:0.000620,6:0.000620,7:0.000620,8:0.000412},
+    cmgCotisPlafond:{moins3:524,'3a6':263}, cmgCotisTaux:0.50,
+    creditTaux:0.50, dureeLegale:40, maj25:1.25, maj50:1.50,
+  },
+  creche:{
+    tauxEffort:{1:0.000619,2:0.000516,3:0.000413,4:0.000310,5:0.000310,6:0.000310,7:0.000310,8:0.000206},
+    plancher:814.62, plafondVille:{paris:8500,levallois:8500,prive:8500,neuilly:9162},
+    semaines:52, creditTaux:0.50, creditPlafondParEnfant:3500,
+  },
+  plafondNiches:10000,
+};
+const NOM_VILLE={paris:"Paris",levallois:"Levallois-Perret",neuilly:"Neuilly-sur-Seine",prive:"Crèche privée PSU/employeur"};
+const eur=n=>Math.round(n).toLocaleString('fr-FR')+' €';
+const clamp=(x,lo,hi)=>Math.max(lo,Math.min(x,hi));
+
+// ====================== MODÈLES ======================
+function bruteMensuel(hHebdo,taux){
+  const g=P.gad;
+  const hNorm=Math.min(hHebdo,g.dureeLegale);
+  const h25=Math.min(Math.max(hHebdo-40,0),8);
+  const h50=Math.max(hHebdo-48,0);
+  const hebdo=hNorm*taux + h25*taux*g.maj25 + h50*taux*g.maj50;
+  return hebdo*52/12;
+}
+function calcGAD(o){ // o:{heures,taux,age,nbEnfants,revenu}
+  const g=P.gad;
+  const brut=bruteMensuel(o.heures,o.taux);
+  const cotisSal=brut*g.tauxSalarial;
+  const cotisPat=brut*g.tauxPatronal + g.santeTravailFixe;
+  const totalCotis=cotisSal+cotisPat;
+  const net=brut-cotisSal;
+  const deduction=g.deductionParHeure*(o.heures*g.semainesTravaillees/12);
+  const cmgCotis=Math.min(g.cmgCotisTaux*totalCotis, g.cmgCotisPlafond[o.age]);
+  const revenu=clamp(o.revenu,g.plancher,g.plafondRessources);
+  const facteur=Math.max(0,1-revenu*g.tauxEffort[o.nbEnfants]/g.coutRef);
+  const cmgRem=net*facteur;
+  const cashAvantCI=net+(totalCotis-cmgCotis-deduction)-cmgRem;
+  const plafondDep=Math.min(12000+1500*o.nbEnfants,15000);
+  const creditAn=g.creditTaux*Math.min(cashAvantCI*12,plafondDep);
+  return {brut,net,totalCotis,deduction,cmgCotis,cmgRem,facteur,cashAvantCI,creditAn};
+}
+function calcCreche(o){ // o:{ville,heures,nbEnfants,revenu}
+  const c=P.creche;
+  const hMois=o.heures*c.semaines/12;
+  const tarif=clamp(o.revenu,c.plancher,c.plafondVille[o.ville])*c.tauxEffort[o.nbEnfants];
+  const coutBrut=tarif*hMois;
+  const creditAn=c.creditTaux*Math.min(coutBrut*12,c.creditPlafondParEnfant);
+  return {hMois,tarif,coutBrut,creditAn};
+}
+
+// ====================== RENDU ======================
+function val(id){return document.getElementById(id).value;}
+function num(id){return parseFloat(val(id))||0;}
+function chk(id){return document.getElementById(id).checked;}
+
+function render(){
+  const revenu=num('revenu'), nbEnfants=clamp(parseInt(val('nbEnfants'))||1,1,8), autres=num('autresNiches');
+  const gadOn=chk('gadOn'), crOn=chk('crOn');
+  let cash=0, lines=[], detail=[], creditChildcareAn=0;
+
+  if(gadOn){
+    const g=calcGAD({heures:num('gadHeures'),taux:num('gadTaux'),age:val('gadAge'),nbEnfants,revenu});
+    cash+=g.cashAvantCI; creditChildcareAn+=g.creditAn;
+    lines.push(['<b>Garde à domicile</b> — décaissé/mois (avant impôt)',g.cashAvantCI,'pos']);
+    detail.push(`<b>Garde à domicile</b> (${num('gadHeures')} h/sem) :<br>`+
+      `&nbsp;brut ${eur(g.brut)} · net ${eur(g.net)} · cotisations ${eur(g.totalCotis)}<br>`+
+      `&nbsp;− déduction forfaitaire ${eur(g.deduction)} − CMG cotisations ${eur(g.cmgCotis)} − CMG rémunération ${eur(g.cmgRem)} (facteur ${g.facteur.toFixed(4)})<br>`+
+      `&nbsp;= <b>${eur(g.cashAvantCI)}/mois</b> avant crédit d'impôt`);
+  }
+  if(crOn){
+    const c=calcCreche({ville:val('crVille'),heures:num('crHeures'),nbEnfants,revenu});
+    cash+=c.coutBrut; creditChildcareAn+=c.creditAn;
+    lines.push([`<b>Crèche</b> (${NOM_VILLE[val('crVille')]}) — /mois (avant impôt)`,c.coutBrut,'pos']);
+    detail.push(`<b>Crèche</b> (${num('crHeures')} h/sem = ${c.hMois.toFixed(0)} h/mois, ${NOM_VILLE[val('crVille')]}) :<br>`+
+      `&nbsp;tarif ${c.tarif.toFixed(2)} €/h × ${c.hMois.toFixed(0)} h = <b>${eur(c.coutBrut)}/mois</b>`);
+  }
+
+  // plafond global des niches
+  const dispo=Math.max(0,P.plafondNiches-autres);
+  const usableAn=Math.min(creditChildcareAn,dispo);
+  const ecreteAn=creditChildcareAn-usableAn;
+  const creditMois=usableAn/12;
+  const coutReel=cash-creditMois;
+
+  // total
+  document.getElementById('totalMois').textContent=(gadOn||crOn)?eur(coutReel):'— €';
+  document.getElementById('totalAn').textContent=eur(coutReel*12);
+
+  // breakdown
+  let html='';
+  lines.forEach(([lab,v,cls])=>html+=`<div class="line"><span>${lab}</span><span class="v ${cls}">${eur(v)}</span></div>`);
+  if(gadOn||crOn){
+    html+=`<div class="line"><span>Sous-total décaissé / mois</span><span class="v">${eur(cash)}</span></div>`;
+    html+=`<div class="line"><span>Crédits d'impôt (50 %)</span><span class="v neg">− ${eur(creditMois)}</span></div>`;
+  }
+  document.getElementById('breakdown').innerHTML=html;
+
+  // ceiling note
+  let note='';
+  if(creditChildcareAn>0){
+    if(ecreteAn>0.5){
+      note=`<div class="warn">⚠️ Plafond des niches atteint : ${eur(ecreteAn)}/an de crédit d'impôt perdus
+        (crédits garde ${eur(creditChildcareAn)} + autres niches ${eur(autres)} &gt; 10 000 €).</div>`;
+    }else{
+      note=`<div class="ok">✓ Crédits d'impôt garde ${eur(creditChildcareAn)}/an + autres ${eur(autres)} = ${eur(creditChildcareAn+autres)}/an, sous le plafond de 10 000 €.</div>`;
+    }
+  }
+  document.getElementById('ceilingNote').innerHTML=note;
+  document.getElementById('detail').innerHTML=(gadOn||crOn)?detail.join('<hr style="border:none;border-top:1px dashed #e5e7eb;margin:10px 0">'):'Activez au moins un mode de garde.';
+}
+
+// ====================== PRESETS ======================
+function set(id,v){document.getElementById(id).value=v;}
+function setChk(id,v){document.getElementById(id).checked=v;}
+function preset(name){
+  if(name==='domicileSeule'){setChk('gadOn',true);set('gadHeures',48);setChk('crOn',false);}
+  if(name==='mix'){setChk('gadOn',true);set('gadHeures',35);set('gadAge','moins3');setChk('crOn',true);set('crVille','prive');set('crHeures',30);}
+  if(name==='crecheSeule'){setChk('gadOn',false);setChk('crOn',true);set('crVille','prive');set('crHeures',50);}
+  render();
+}
+
+// ====================== INIT (config perso optionnelle) ======================
+function applyConfig(){
+  const c=window.SIM_CONFIG; if(!c) return;
+  const map={revenu:'revenu',nbEnfants:'nbEnfants',autresNiches:'autresNiches',
+    gadHeures:'gadHeures',gadTaux:'gadTaux',crVille:'crVille',crHeures:'crHeures'};
+  for(const k in map) if(c[k]!==undefined) set(map[k],c[k]);
+  if(c.gadAge!==undefined) set('gadAge',c.gadAge);
+  if(c.gadOn!==undefined) setChk('gadOn',c.gadOn);
+  if(c.crOn!==undefined) setChk('crOn',c.crOn);
+}
+applyConfig();
+document.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',render));
+render();
+</script>
+</body>
+</html>
