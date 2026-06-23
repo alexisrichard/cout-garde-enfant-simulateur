@@ -7,6 +7,8 @@ et le **plafonnement global des niches fiscales à 10 000 €**.
 Tout tient dans une page HTML statique : **aucune donnée n'est envoyée nulle part**, tout est calculé
 dans votre navigateur.
 
+**▶️ Démo en ligne : <https://alexisrichard.github.io/cout-garde-enfant-simulateur/>**
+
 > ⚠️ **Avertissement.** Estimation **indicative**, sans valeur contractuelle, qui ne constitue **pas un
 > conseil fiscal**. Les barèmes évoluent et votre situation peut comporter des spécificités. Vérifiez vos
 > droits réels sur les simulateurs officiels (Pajemploi, CAF) et auprès d'un professionnel.
