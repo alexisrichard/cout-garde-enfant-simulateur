@@ -27,6 +27,18 @@ dans votre navigateur.
 1. Ouvrez simplement [`index.html`](index.html) dans un navigateur (ou via GitHub Pages si activé).
 2. Réglez les paramètres : le coût réel mensuel/annuel se met à jour en direct.
 
+### 🤖 Utiliser avec une IA (ChatGPT, Claude, Gemini…)
+
+Vous préférez tout faire en langage naturel ? Donnez à votre assistant IA le lien du fichier
+[`LLM_INSTRUCTIONS.md`](LLM_INSTRUCTIONS.md) :
+
+```
+https://raw.githubusercontent.com/alexisrichard/cout-garde-enfant-simulateur/main/LLM_INSTRUCTIONS.md
+```
+
+puis demandez-lui de simuler votre coût de garde. Ce fichier est **autonome** : il contient toutes les
+formules, constantes 2026 et exemples de validation pour que l'IA calcule directement et fiablement.
+
 ### Pré-remplir avec vos données (et les garder privées)
 
 Copiez le modèle et renseignez vos valeurs :
