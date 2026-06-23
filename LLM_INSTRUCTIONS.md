@@ -122,13 +122,13 @@ COUT_REEL_AN    = COUT_REEL_MOIS * 12
 
 ## 4. Exemples de validation (auto-vérification)
 
-Foyer **3 enfants**, **revenu 13 000 €/mois** (> plafond), `gadTaux=12.89`, `gadAge="<3"` :
+Foyer **3 enfants**, **revenu > 8 500 €/mois** (donc plafonné), `gadTaux=12.89`, `gadAge="<3"` :
 
 | Scénario | Entrées | Résultat attendu (coût réel) |
 |---|---|---|
 | Garde à domicile seule | gadHeures=48, pas de crèche | **≈ 1 798 €/mois** (21 580 €/an) |
 | Crèche + domicile | gadHeures=35 + crèche `prive` crHeures=30 | **≈ 1 215 €/mois** (14 580 €/an) |
-| Contrôle crèche (brut) | crèche `prive`, crHeures=50, revenu 156 000 €/an (=13 000/mois) | tarif 3,51 €/h → coût brut **≈ 760,6 €/mois** |
+| Contrôle crèche (brut) | crèche `prive`, crHeures=50, revenu > 102 000 €/an (plafonné) | tarif 3,51 €/h → coût brut **≈ 760,6 €/mois** |
 
 Détail attendu du 2ᵉ cas : domicile décaissé ≈ 1 530 € + crèche ≈ 456 € = 1 986 € ; crédits 625 + 146 = 771 €/mois
 (9 250 €/an < 10 000 €, non écrêté) → **1 215 €/mois**.
